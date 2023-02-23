@@ -1,24 +1,28 @@
-// sqlite3. CRUD orperations
+// SQLite3 CRUD operations
 // npm install sqlite3
-// create a bood.sqlite file in Database folder
-// Run this file with node CRUDBookSQL.js
-// Test with postman
+// Craete a Bood.sqlite file in Database folder
+// Run this file with node CRUDBookSQLite.js
+// Test with Postman
 
 const express = require('express');
 const sqlite3 = require('sqlite3');
 const app = express();
 
-// connect to data base
+// connect to database
 const db = new sqlite3.Database('./Database/Book.sqlite');
 
 // parse incoming requests
 app.use(express.json());
 
-// create books table if it doesn't exist 
-db.run(`CREATE TABLE IF NOT EXISTS books (id INTEGER PRIMARY KEY, title TEXT, author TEXT)`);
+// create books table if it doesn't exist
+db.run(`CREATE TABLE IF NOT EXISTS books (
+    id INTEGER PRIMARY KEY,
+    title TEXT,
+    author TEXT
+)`);
 
-// route to get all books 
-app.get('/books',(req, res) => {
+// route to get all books
+app.get('/books', (req,res) => {
     db.all('SELECT * FROM books', (err, rows) => {
         if (err) {
             res.status(500).send(err);
@@ -29,47 +33,53 @@ app.get('/books',(req, res) => {
 });
 
 // route to get a book by id
-app.get('/books/:id', (req, res) => {
-    db.get('SELECT * FROM books WHERE id = ?', req.params.id, (err, row) => {
+app.get('/books/:id', (req,res) => {
+    db.all('SELECT * FROM books WHERE id = ?', req.params.id , (err, row) => {
         if (err) {
             res.status(500).send(err);
-        }else {
-            if (!row) {
-                res.status(404).send('Book not found');
-            }else {
-                res.json(row);
-            }
+        } else {
+           if (!row) {
+            res.status(404).send('Book not found');
+           } else {
+            res.json(row);
+           }
         }
     });
 });
 
 // route to create a new book
-app.post('/books', (req, res) => {
+app.post('/books',(req, res) => {
     const book = req.body;
-    db.run('INSERT INTO books (title, author) VALUES (?, ?)', book.title, book.author, function(err) {
+    db.run('INSERT INTO books (title,author) VALUES (? , ?)', book.title, book.author , function(err) {
         if (err) {
             res.status(500).send(err);
-        }else {
+        } else {
             book.id = this.lastID;
             res.send(book);
         }
     });
 });
 
+
 // route to update a book
-app.put('/books/:id', (req, res) => {
-    db.run('UPDATE books SET title = ?, author = ? WHERE id = ?', book.title, book.author, req.params.id, function(err) {
+app.put('/books/:id' , (req, res) => {
+    const book = req.body;
+    db.run('UPDATE books SET title = ? , author = ? WHERE id = ?' , book.title , book.author, req.params.id, function(err) {
         if (err) {
             res.status(500).send(err);
         } else {
-            res.send(book);
+            if (!row) {
+                res.status(404).send('Book not found')}
+            else{
+                res.send(book)};
+            
         }
     });
 });
 
-// route to delete a book 
-app.delete('/books/:id', (req, res) => {
-    db.run('DELETE FROM books WHERE id = ?', req.params.id, function(err) {
+// route to delete a book
+app.delete('/books/:id' , (req, res) => {
+    db.run('DELETE FROM books WHERE id = ?' , req.params.id , function(err) {
         if (err) {
             res.status(500).send(err);
         } else {
