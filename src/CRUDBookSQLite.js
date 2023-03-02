@@ -68,11 +68,7 @@ app.put('/books/:id' , (req, res) => {
         if (err) {
             res.status(500).send(err);
         } else {
-            if (!row) {
-                res.status(404).send('Book not found')}
-            else{
-                res.send(book)};
-            
+            res.send(book);
         }
     });
 });
